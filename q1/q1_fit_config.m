@@ -8,4 +8,5 @@ cc.Ea=1e4*theta(2);
 cc.j0ref=exp(theta(1))*exp(cc.Ea/cc.R*(1/253.15-1/298.15));
 cc.fCL=exp(theta(3)); cc.kineticHydrationExponent=theta(4);
 if numel(theta)>=5,cc.boundWaterDiffusivityScale=exp(theta(5));end
+if numel(theta)>=6,cc.kbl=exp(theta(6));end
 end

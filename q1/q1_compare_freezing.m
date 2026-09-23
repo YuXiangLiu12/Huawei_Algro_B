@@ -1,6 +1,6 @@
 function report=q1_compare_freezing(root)
 % Diagnostic structural comparison. Nucleation thresholds are hypotheses.
-if nargin<1,root=fileparts(mfilename('fullpath'));end
+if nargin<1,root=fileparts(fileparts(mfilename('fullpath')));end
 base=q1_config(); [cases,~]=q1_read_data(root,base);
 specs={ ...
     'direct_ice',struct(); ...
@@ -27,7 +27,7 @@ for z=1:size(specs,1)
 end
 report=cell2table(rows,'VariableNames',{'closure','case_name','status', ...
     'ice_onset_s','ice_absolute_peak','ice_saturation_peak', ...
-    'liquid_saturation_peak','V_RMSE','T_RMSE_K','water_error','energy_error'});
+    'liquid_saturation_peak','V_RMSE','T_RMSE_C','water_error','energy_error'});
 folder=fullfile(root,'results','checks');if ~isfolder(folder),mkdir(folder);end
 writetable(report,fullfile(folder,'freezing_structure_comparison.csv'));
 end

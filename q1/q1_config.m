@@ -20,6 +20,7 @@ c.concentrationModel='limiting_current'; c.concentrationFactor=1;
 c.voltageResistance='power_average'; c.activitySurface='ice_below_zero';
 c.reactionClosure='parallel_active'; % local_average retains v0.3 control
 c.kineticHydrationExponent=0; % hypothesis-only sensitivity, not in baseline
+c.boundWaterDiffusivityScale=1; c.fitTransport=false;
 c.temperatureAverage='seven_layer'; c.conductivity='springer1268';
 c.iceEnabled=true; c.iceFeedback=true; c.pemFreeze=true;
 c.phaseHeat=true; c.freezeConductivityLambda=false;

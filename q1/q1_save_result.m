@@ -2,7 +2,10 @@ function out=q1_save_result(cases,c,folder,label,level)
 % Export only complete valid runs; declare fitted-vs-held-out status in label.
 if nargin<5,level='medium';end
 if ~isfolder(folder),mkdir(folder);end
-c.runCalibration=true;c.version='q1-v0.5-calibrated';
+c.runCalibration=true;
+if ~isfield(c,'version') || strcmp(c.version,'q1-v0.4-implementation')
+    c.version='q1-v0.5-calibrated';
+end
 out.cfg=c;out.cases=cases;
 for k=1:numel(cases)
     run=q1_simulate(cases(k),c,level);out.runs(k)=run;
@@ -35,7 +38,7 @@ for k=1:numel(cases)
         out.runs(k).balance.ew,out.runs(k).balance.eE,string(level)};
 end
 out.summary=cell2table(rows,'VariableNames',{'case_name','result_type','V_RMSE', ...
-    'T_RMSE_K','V_RMSE_0_6','V_RMSE_6_end','ice_onset_s','ice_volume_peak', ...
+    'T_RMSE_C','V_RMSE_0_6','V_RMSE_6_end','ice_onset_s','ice_volume_peak', ...
     'ice_saturation_peak','liquid_saturation_peak','water_error','energy_error','grid'});
 writetable(out.summary,fullfile(folder,'summary.csv'));
 end

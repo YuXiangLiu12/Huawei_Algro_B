@@ -1,6 +1,6 @@
 function summary=q1_run_experiments(root,selected,level)
 % Structural runs use identical parameters. Refit before model-selection claims.
-if nargin<1,root=fileparts(mfilename('fullpath'));end
+if nargin<1,root=fileparts(fileparts(mfilename('fullpath')));end
 if nargin<2,selected=string.empty;end
 if nargin<3,level='coarse';end
 base=q1_config();
@@ -55,7 +55,7 @@ for i=1:size(specs,1)
     end
 end
 summary=cell2table(rows,'VariableNames',{'experiment','case_name','status', ...
-    'event','t_end_s','V_RMSE','T_RMSE_K','ice_absolute_final', ...
+    'event','t_end_s','V_RMSE','T_RMSE_C','ice_absolute_final', ...
     'ice_saturation_final','liquid_saturation_max','water_error','energy_error'});
 folder=fullfile(root,'results','experiments');
 if ~isfolder(folder),mkdir(folder);end

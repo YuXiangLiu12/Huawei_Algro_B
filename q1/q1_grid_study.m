@@ -1,5 +1,5 @@
 function summary=q1_grid_study(root,c,caseIndex)
-if nargin<1,root=fileparts(mfilename('fullpath'));end
+if nargin<1,root=fileparts(fileparts(mfilename('fullpath')));end
 if nargin<2,c=q1_config();end
 if nargin<3,caseIndex=1:2;end
 [cases,~]=q1_read_data(root,c);

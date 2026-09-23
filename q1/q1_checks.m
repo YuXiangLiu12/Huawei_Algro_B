@@ -1,5 +1,5 @@
 function checks=q1_checks(root)
-if nargin<1,root=fileparts(mfilename('fullpath'));end
+if nargin<1,root=fileparts(fileparts(mfilename('fullpath')));end
 c=q1_config(); [d,a]=q1_read_data(root,c);
 names={}; values=[]; limits=[];
 g=q1_make_grid(c,'medium'); ix=q1_make_index(g);

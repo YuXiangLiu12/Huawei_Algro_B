@@ -1,4 +1,5 @@
 function report=q1_local_phase_checks(root)
+if nargin<1,root=fileparts(fileparts(mfilename('fullpath')));end
 c=q1_config();c.freezingClosure='delayed_nucleation';c.nucleationMode='local';
 c.nucleationThreshold=.03;c.liquidMigration=true;
 [d,~]=q1_read_data(root,c);g=q1_make_grid(c,'coarse');ix=q1_make_index(g);
@@ -18,6 +19,7 @@ y(ix.T(target))=248.15;y(ix.nuc(localIndex))=.5;
 [~,diag]=q1_rhs_diagnostic(0,y,d(2),c,g,ix);
 rows(end+1,:)={'existing_local_nuclei_freeze_liquid',diag.r.li(target)>0};
 report=cell2table(rows,'VariableNames',{'check','pass'});
-writetable(report,fullfile(root,'results','q1_v05','local_phase_checks.csv'));
+folder=fullfile(root,'results','q1_v05');if ~isfolder(folder),mkdir(folder);end
+writetable(report,fullfile(folder,'local_phase_checks.csv'));
 assert(all(report.pass),'Local phase check failed');
 end

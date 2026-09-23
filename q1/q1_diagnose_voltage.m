@@ -1,5 +1,5 @@
 function report=q1_diagnose_voltage(root)
-if nargin<1,root=fileparts(mfilename('fullpath'));end
+if nargin<1,root=fileparts(fileparts(mfilename('fullpath')));end
 base=q1_config(); [d,~]=q1_read_data(root,base);
 kin=q1_fit_kinetics(d,base);
 scenarios={ ...
@@ -35,7 +35,7 @@ for k=1:size(scenarios,1)
     end
 end
 report=cell2table(rows,'VariableNames',{'scenario','case_name','status','V_RMSE', ...
-    'T_RMSE_K','V_RMSE_0_6','V_RMSE_6_15','V_RMSE_15_end', ...
+    'T_RMSE_C','V_RMSE_0_6','V_RMSE_6_15','V_RMSE_15_end', ...
     'V_end_bias','valley_time_error_s','valley_voltage_error'});
 folder=fullfile(root,'results','checks'); if ~isfolder(folder),mkdir(folder);end
 writetable(report,fullfile(folder,'voltage_diagnosis.csv'));

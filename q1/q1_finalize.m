@@ -55,7 +55,7 @@ for k=1:2
         tight.balance.ew,tight.balance.eE};
 end
 checks=cell2table(rows,'VariableNames',{'case_name','comparison','max_dV', ...
-    'max_dT_K','max_dice','V_RMSE','T_RMSE_K','water_error','energy_error'});
+    'max_dT_K','max_dice','V_RMSE','T_RMSE_C','water_error','energy_error'});
 writetable(checks,fullfile(folder,'numerical_checks.csv'));
 q1_revision_checks(root);q1_local_phase_checks(root);
 % Ice observations do not exist: vary the assumed threshold rather than fit it.
@@ -72,7 +72,7 @@ for threshold=[.02 .03 .04]
     end
 end
 sensitivity=cell2table(rows,'VariableNames',{'assumed_threshold','case_name','ice_onset_s', ...
-    'ice_volume_peak','V_RMSE','T_RMSE_K','liquid_saturation_peak'});
+    'ice_volume_peak','V_RMSE','T_RMSE_C','liquid_saturation_peak'});
 writetable(sensitivity,fullfile(folder,'ice_assumption_sensitivity.csv'));
 disp(allSummary);disp(checks);disp(sensitivity);
 fprintf('SELECTED %s\n',selectedStage);

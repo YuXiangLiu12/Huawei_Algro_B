@@ -1,5 +1,5 @@
 function summary=q1_step_study(root,caseIndex)
-if nargin<1,root=fileparts(mfilename('fullpath'));end
+if nargin<1,root=fileparts(fileparts(mfilename('fullpath')));end
 if nargin<2,caseIndex=1;end
 c=q1_config(); [cases,~]=q1_read_data(root,c); d=cases(caseIndex);
 steps=[.05 .025 .0125 .0125]; tolerances=[1e-6 1e-6 1e-6 1e-7];
