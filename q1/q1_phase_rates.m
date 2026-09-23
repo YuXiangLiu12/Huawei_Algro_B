@@ -17,13 +17,24 @@ if strcmp(c.freezingClosure,'delayed_nucleation')
         (c.kcond*max(p.pv(mw)-p.psl(mw),0)- ...
         c.kevap*max(p.psl(mw)-p.pv(mw),0).*donorL(mw));
     mp=g.porous&cold;
-    r.li(mp)=c.kfreeze*max(s.nuc,0).*max(s.ml(mp),0);
+    if strcmp(g.nucleationMode,'local')
+        r.li(mp)=c.kfreeze*max(s.nuc(mp),0).*max(s.ml(mp),0);
+    else
+        r.li(mp)=c.kfreeze*max(s.nuc,0).*max(s.ml(mp),0);
+    end
     mp=g.porous&~cold;
     r.li(mp)=-c.kmelt*max(s.mi(mp),0);
     if c.pemFreeze
         mp=g.pem&cold;
-        r.bf(mp)=max(s.nuc,0)*c.knf*c.Cm.* ...
-            max(p.lambda(mp)-p.lambdaSat(mp),0);
+        if strcmp(g.nucleationMode,'local')
+            % Dissolved PEM water freezes by its own capacity law; a remote
+            % GDL liquid saturation must not trigger every membrane cell.
+            r.bf(mp)=c.knf*c.Cm.*max(p.lambda(mp)-p.lambdaSat(mp),0) ...
+                -c.kfn*min(max(s.bf(mp),0),c.Cm*max(p.lambdaSat(mp)-p.lambda(mp),0));
+        else
+            r.bf(mp)=max(s.nuc,0)*c.knf*c.Cm.* ...
+                max(p.lambda(mp)-p.lambdaSat(mp),0);
+        end
         mp=g.pem&~cold; r.bf(mp)=-c.kfn*max(s.bf(mp),0);
     end
     return;

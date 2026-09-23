@@ -13,9 +13,15 @@ if g.clFrozenWater
     ix.bfc=(n+1:n+numel(ix.bfccells))'; n=n+numel(ix.bfccells);
     ix.scale(ix.bfc,1)=100;
 end
-ix.nuc=[];
+ix.nuc=[]; ix.nuccells=[];
 if strcmp(g.freezingClosure,'delayed_nucleation')
-    ix.nuc=n+1; n=n+1; ix.scale(ix.nuc,1)=1;
+    if strcmp(g.nucleationMode,'local')
+        ix.nuccells=find(g.porous);
+        ix.nuc=(n+1:n+numel(ix.nuccells))';n=n+numel(ix.nuccells);
+    else
+        ix.nuc=n+1;n=n+1;
+    end
+    ix.scale(ix.nuc,1)=1;
 end
 ix.Q=n+1; ix.Mout=n+2; ix.Mvout=n+3;
 ix.Eec=n+4; ix.Econv=n+5; ix.Ephase=n+6;

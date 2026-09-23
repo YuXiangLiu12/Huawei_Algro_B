@@ -20,6 +20,9 @@ source={'physical_constant';'physical_constant';'rounded_attachment_convention';
     'attachment_1_default';'problem_default';'structural_parameter'; ...
     'working_assumption';'working_assumption';'working_assumption'; ...
     'attachment_1';'attachment_1'};
+if isfield(c,'runCalibration') && c.runCalibration
+    source{11}='joint_calibration';source{12}='joint_calibration';source{13}='joint_calibration';
+end
 P=table(string(names(:)),vals,string(units(:)),string(source(:)), ...
     'VariableNames',{'parameter','value_SI','unit','source'});
 writetable(P,fullfile(folder,'parameters_SI.csv'));

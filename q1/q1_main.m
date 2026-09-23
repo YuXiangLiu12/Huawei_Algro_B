@@ -1,25 +1,15 @@
-function out=q1_main(root)
-if nargin<1,root=fileparts(mfilename('fullpath'));end
-c=q1_config(); [cases,audit]=q1_read_data(root,c);
-folder=fullfile(root,'results','q1_v04');
-if ~isfolder(folder),mkdir(folder);end
-auditTable=struct2table(audit); writetable(auditTable,fullfile(folder,'input_audit.csv'));
-fit=q1_fit_kinetics(cases,c);
-save(fullfile(folder,'kinetics.mat'),'fit');
-out.cfg=c; out.cases=cases; out.audit=audit; out.kinetics=fit;
-for k=1:2
-    run=q1_simulate(cases(k),c,'medium'); out.runs(k)=run;
-    if isfield(run,'obs')
-        d=cases(k); T=struct2table(run.obs); n=height(T);
-        T.V_exp=d.V_exp(1:n); T.T_exp_C=d.T_exp_C(1:n);
-        T.water_residual=run.balance.waterResidual';
-        T.energy_residual=run.balance.energyResidual';
-        writetable(T,fullfile(folder,sprintf('case%d_observations.csv',k)));
-        save(fullfile(folder,sprintf('case%d_run.mat',k)),'run','d','c','-v7.3');
-    end
+function out=q1_main(root,mode)
+% Reproducible complete workflow. Old v0.4 results are never overwritten.
+% q1_main(projectRoot) reruns both calibration stages and verification.
+% q1_main(projectRoot,'resume') verifies saved v0.5 stage fits.
+if nargin<1,root=fileparts(fileparts(mfilename('fullpath')));end
+if nargin<2,mode='fit';end
+assert(isfile(fullfile(root,'Q1','q1_config.m')),'Pass the project root, not its Q1 subfolder');
+if strcmp(mode,'fit')
+    q1_stage1(root);q1_stage2(root);
+    q1_fit_transport(root,'direct');q1_fit_transport(root,'local');
+elseif ~strcmp(mode,'resume')
+    error('mode must be fit or resume');
 end
-status=table(string({out.runs.status})',string({out.runs.event})', ...
-    [out.runs.t_end]','VariableNames',{'status','event','t_end'});
-writetable(status,fullfile(folder,'solver_status.csv'));
-q1_export_results(out,folder,'unfitted_preview');
+out=q1_finalize(root);
 end

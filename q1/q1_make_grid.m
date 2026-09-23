@@ -23,4 +23,6 @@ g.gammaFace(ip(1):ip(end)+1)=1;
 g.gammaFace(ic(1):ic(end)+1)=linspace(1,0,numel(ic)+1);
 g.clFrozenWater=c.clFrozenWater;
 g.freezingClosure=c.freezingClosure;
+g.nucleationMode='global_legacy';
+if isfield(c,'nucleationMode'),g.nucleationMode=c.nucleationMode;end
 end

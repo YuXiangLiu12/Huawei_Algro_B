@@ -9,37 +9,32 @@ if c.liquidMigration
         (1.417*sl-2.120*sl.^2+1.263*sl.^3);
     mob=c.rhoL*K0.*sl.^3/c.liquidViscosity;
 end
-for k=1:N-1
-    z=k+1;
-    G=conductance(p.k(k),p.k(k+1),g.dx(k),g.dx(k+1));
-    f.T(z)=G*(s.T(k)-s.T(k+1));
-    if g.anode(k)&&g.anode(k+1)
-        G=conductance(p.DH(k),p.DH(k+1),g.dx(k),g.dx(k+1));
-        f.H(z)=G*(p.cH(k)-p.cH(k+1));
-    end
-    if g.cathode(k)&&g.cathode(k+1)
-        G=conductance(p.DO(k),p.DO(k+1),g.dx(k),g.dx(k+1));
-        f.O(z)=G*(p.cO(k)-p.cO(k+1));
-    end
-    if g.porous(k)&&g.porous(k+1) && g.layer(k)~=4
-        G=conductance(p.Dv(k),p.Dv(k+1),g.dx(k),g.dx(k+1));
-        f.v(z)=G*(p.rv(k)-p.rv(k+1));
-        if c.liquidMigration
-            Gabs=conductance(K0(k),K0(k+1),g.dx(k),g.dx(k+1));
-            dpc=pc(k+1)-pc(k);
-            if dpc>=0,sUp=sl(k);else,sUp=sl(k+1);end
-            f.l(z)=c.rhoL/c.liquidViscosity*Gabs*sUp^3*dpc;
-        end
-    end
-    if g.ion(k)&&g.ion(k+1)
-        aL=g.omega(k)^1.5*c.Cm*max(p.Db(k),0);
-        aR=g.omega(k+1)^1.5*c.Cm*max(p.Db(k+1),0);
-        G=conductance(aL,aR,g.dx(k),g.dx(k+1));
-        lamUp=p.lambda(k); if j<0,lamUp=p.lambda(k+1);end
-        drag=2.5*max(lamUp,0)/22*c.Mw*j*gammaFace(z)/c.F;
-        f.b(z)=G*(p.lambda(k)-p.lambda(k+1))+drag;
-    end
+% Vectorized internal faces; identical harmonic conductances and upwinding.
+k=(1:N-1)'; z=k+1;
+G=conductance(p.k(k),p.k(k+1),g.dx(k),g.dx(k+1));
+f.T(z)=G.*(s.T(k)-s.T(k+1));
+ka=k(g.anode(k)&g.anode(k+1));
+G=conductance(p.DH(ka),p.DH(ka+1),g.dx(ka),g.dx(ka+1));
+f.H(ka+1)=G.*(p.cH(ka)-p.cH(ka+1));
+kc=k(g.cathode(k)&g.cathode(k+1));
+G=conductance(p.DO(kc),p.DO(kc+1),g.dx(kc),g.dx(kc+1));
+f.O(kc+1)=G.*(p.cO(kc)-p.cO(kc+1));
+kp=k(g.porous(k)&g.porous(k+1)&g.layer(k)~=4);
+G=conductance(p.Dv(kp),p.Dv(kp+1),g.dx(kp),g.dx(kp+1));
+f.v(kp+1)=G.*(p.rv(kp)-p.rv(kp+1));
+if c.liquidMigration
+    Gabs=conductance(K0(kp),K0(kp+1),g.dx(kp),g.dx(kp+1));
+    dpc=pc(kp+1)-pc(kp); sUp=sl(kp);
+    neg=dpc<0; sUp(neg)=sl(kp(neg)+1);
+    f.l(kp+1)=c.rhoL/c.liquidViscosity*Gabs.*sUp.^3.*dpc;
 end
+ki=k(g.ion(k)&g.ion(k+1));
+aL=g.omega(ki).^1.5*c.Cm.*max(p.Db(ki),0);
+aR=g.omega(ki+1).^1.5*c.Cm.*max(p.Db(ki+1),0);
+G=conductance(aL,aR,g.dx(ki),g.dx(ki+1));
+lamUp=p.lambda(ki); if j<0,lamUp=p.lambda(ki+1);end
+drag=2.5*max(lamUp,0)/22*c.Mw*j.*gammaFace(ki+1)/c.F;
+f.b(ki+1)=G.*(p.lambda(ki)-p.lambda(ki+1))+drag;
 Gt=1/(g.dx(1)/(2*p.k(1))+1/c.h);
 f.T(1)=-Gt*(s.T(1)-d.Tamb);
 Gt=1/(g.dx(end)/(2*p.k(end))+1/c.h);
@@ -56,7 +51,8 @@ end
 end
 
 function G=conductance(a,b,da,db)
-if a<=0||b<=0,G=0;else,G=1/(da/(2*a)+db/(2*b));end
+G=zeros(size(a)); m=a>0&b>0;
+G(m)=1./(da(m)./(2*a(m))+db(m)./(2*b(m)));
 end
 
 function J=vaporOutlet(Jdiff,j,T,c,side)

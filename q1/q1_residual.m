@@ -1,12 +1,12 @@
 function [r,detail]=q1_residual(theta,cases,c,level)
-% theta = log([j0_ref(A/m^2), fCL]); a failed full trace gets fixed-length penalty.
+% See q1_fit_config for fit coordinates. Failed runs get a fixed-length penalty.
 if nargin<4,level='coarse';end
-cc=c; cc.j0ref=exp(theta(1)); cc.fCL=exp(theta(2));
+cc=q1_fit_config(theta,c);
 r=[]; detail=repmat(struct('status','','event','','V_RMSE',NaN,'T_RMSE',NaN),1,numel(cases));
 for k=1:numel(cases)
     d=cases(k); run=q1_simulate(d,cc,level); n=numel(d.t);
     detail(k).status=run.status; detail(k).event=run.event;
-    if strcmp(run.status,'VALID') && numel(run.obs)==n
+    if strcmp(run.status,'VALID') && isfield(run,'obs') && numel(run.obs)==n
         V=[run.obs.V_sim]';
         if strcmp(cc.temperatureAverage,'seven_layer')
             T=[run.obs.T_seven_C]';

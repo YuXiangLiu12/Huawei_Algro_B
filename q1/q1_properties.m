@@ -29,6 +29,9 @@ m=T>=223.15 & T<273.15;
 p.lambdaSat(m)=1./(-1.304+.01479*T(m)-3.594e-5*T(m).^2);
 lam=p.lambda; poly=2.563-.33*lam+.0264*lam.^2-.000671*lam.^3;
 p.Db=1e-10*exp(2416*(1/303.15-1./T)).*poly;
+if isfield(c,'boundWaterDiffusivityScale')
+    p.Db=p.Db*c.boundWaterDiffusivityScale;
+end
 p.kappa=(.5139*lam-.326).*exp(1268*(1/303.15-1./T));
 if strcmp(c.conductivity,'cold2222')
     p.kappa=100*exp(2222*(1/303-1./T)).*(.005139*lam-.00326);

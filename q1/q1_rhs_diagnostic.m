@@ -27,8 +27,16 @@ dy(ix.mv)=dv(g.porous); dy(ix.ml)=dl(g.porous); dy(ix.mi)=di(g.porous);
 dy(ix.bn)=db(g.ion); dy(ix.bf)=df(g.pem);
 if ~isempty(ix.bfc),dy(ix.bfc)=dbc(g.aCL|g.cCL);end
 if ~isempty(ix.nuc)
-    dy(ix.nuc)=c.nucleationRate*max(max(p.sl(g.porous))-c.nucleationThreshold,0) ...
-        *max(1-s.nuc,0);
+    if strcmp(g.nucleationMode,'local')
+        m=g.porous; cold=s.T(m)<273.15;
+        % Local empirical nucleation progress; threshold is a sensitivity
+        % assumption, not a measured onset or a calibrated ice observation.
+        dy(ix.nuc)=c.nucleationRate*max(p.sl(m)-c.nucleationThreshold,0) ...
+            .*max(1-s.nuc(m),0).*cold-c.kmelt*max(s.nuc(m),0).*(~cold);
+    else
+        dy(ix.nuc)=c.nucleationRate*max(max(p.sl(g.porous))-c.nucleationThreshold,0) ...
+            *max(1-s.nuc,0);
+    end
 end
 ia=find(g.anode,1,'first'); ic=find(g.cathode,1,'last');
 dy(ix.Q)=j; dy(ix.Mout)=f.v(ic+1)-f.v(ia)+f.l(ic+1)-f.l(ia);
