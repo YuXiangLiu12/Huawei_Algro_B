@@ -1,6 +1,7 @@
 function [cases,audit] = q1_read_data(root,cfg)
 % Read original observations; rebuild current density from the unsmoothed I column.
-if nargin<1 || isempty(root),root=fileparts(fileparts(mfilename('fullpath')));end
+if nargin<1,root=[];end
+root=q1_project_root(root);
 if nargin<2,cfg=q1_config();end
 f=fullfile(root,'附件2.xlsx');
 assert(isfile(f),'Cannot find 附件2.xlsx under project root: %s',root);

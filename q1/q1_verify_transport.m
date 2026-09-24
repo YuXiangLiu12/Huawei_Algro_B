@@ -1,12 +1,14 @@
 function report=q1_verify_transport(root,closure,fitfile,folder)
 % Verify one saved fit without requiring historical fits or source snapshots.
 % Thresholds below are numerical acceptance targets, not experimental errors.
-if nargin<1,root=fileparts(fileparts(mfilename('fullpath')));end
+if nargin<1,root=[];end
+root=q1_project_root(root);
 if nargin<2,closure='direct';end
 base=fullfile(root,'results','q1_v05');
 if nargin<3,fitfile=fullfile(base,['fit_transport_' closure '.mat']);end
 s=load(fitfile,'fit','cases');
-fit=s.fit;cases=s.cases;c=fit.cfg;
+fit=s.fit;c=fit.cfg;[cases,~]=q1_read_data(root,c);
+if isfield(c,'calibrationCheckpoint'),c.calibrationCheckpoint='';end
 if nargin<4,folder=fullfile(base,['verification_' closure]);end
 if ~isfolder(folder),mkdir(folder);end
 limits=[.005 .05 .005]; % V, K, absolute ice volume fraction

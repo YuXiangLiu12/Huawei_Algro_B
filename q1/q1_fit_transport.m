@@ -1,5 +1,6 @@
 function fit=q1_fit_transport(root,closure,maxEvals)
-if nargin<1,root=fileparts(fileparts(mfilename('fullpath')));end
+if nargin<1,root=[];end
+root=q1_project_root(root);
 if nargin<2,closure='direct';end
 if nargin<3,maxEvals=600;end
 folder=fullfile(root,'results','q1_v05');c=q1_config();[cases,~]=q1_read_data(root,c);
